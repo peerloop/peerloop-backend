@@ -63,6 +63,7 @@ class LoginRequest(BaseModel):
 class LoginResponse(BaseModel):
     access_token: str = Field(default=...)
     refresh_token: str = Field(default=...)
+    token_type: str = Field(default="bearer")
 
 
 class VerifyEmailRequest(BaseModel):

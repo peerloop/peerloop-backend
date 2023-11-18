@@ -31,7 +31,7 @@ async def login(
     resp = await user_service.login(email=request.email, password=request.password)
     access_token = resp["access_token"]
     refresh_token = resp["refresh_token"]
-    return LoginResponse(access_token=access_token, refresh_token=refresh_token)
+    return LoginResponse(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
 
 
 @router.post(
