@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "peerloop main backend"
 authors = ["peerloop"]
 readme = "README.md"
+packages = [{include="peerloop"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
