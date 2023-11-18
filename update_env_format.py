@@ -4,7 +4,7 @@ Read env file and create a env format file with empty values
 import argparse
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", "-e", type=str, help="path to env file", default=".env.local")
     parser.add_argument("--output-path", "-o", type=str, help="path to output file", default=".env-format")
