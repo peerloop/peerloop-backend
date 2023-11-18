@@ -1,0 +1,12 @@
+{
+    "cSpell.words": [
+        "fastapi",
+        "mailgun",
+        "peerloop",
+        "redoc",
+        "scopefunc",
+        "sessionmaker",
+        "sqlalchemy",
+        "uvicorn"
+    ]
+}
