@@ -1,12 +1,9 @@
 from email_validator import EmailNotValidError, validate_email
 
-from peerloop.core.exceptions.validation import InvalidEmailError
 
-
-def validate_email_format(email: str) -> str:
+def is_valid_email_format(email: str) -> bool:
     try:
-        validation = validate_email(email)
-        valid_email = validation.email
+        _ = validate_email(email)
     except EmailNotValidError:
-        raise InvalidEmailError(f"Invalid Email Error: {email} is not a valid email address.")
-    return valid_email
+        return False
+    return True

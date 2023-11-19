@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, validator
 
-from peerloop.core.utils.validation import validate_email_format
+from peerloop.core.exceptions.validation import InvalidEmailError
+from peerloop.core.utils.validation import is_valid_email_format
 from peerloop.domain.user.exceptions import InvalidPasswordFormatError
 
 
@@ -10,7 +11,9 @@ class RegisterRequest(BaseModel):
 
     @validator("email")
     def email_must_be_valid(cls, v: str) -> str:
-        return validate_email_format(v)
+        if not is_valid_email_format(v):
+            raise InvalidEmailError(f"Invalid Email Error: {v} is not a valid email address.")
+        return v
 
     @validator("password")
     def password_must_be_valid(cls, v: str) -> str:
@@ -50,4 +53,6 @@ class VerifyEmailRequest(BaseModel):
 
     @validator("email")
     def email_must_be_valid(cls, v: str) -> str:
-        return validate_email_format(v)
+        if not is_valid_email_format(v):
+            raise InvalidEmailError(f"Invalid Email Error: {v} is not a valid email address.")
+        return v
