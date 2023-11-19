@@ -31,6 +31,13 @@ class UserAlreadyExistsError(BaseCustomException):
         super().__init__(self.status_code, detail)
 
 
+class UserNotVerifiedError(BaseCustomException):
+    status_code = status.HTTP_400_BAD_REQUEST
+
+    def __init__(self, detail: str) -> None:
+        super().__init__(self.status_code, detail)
+
+
 class IncorrectPasswordError(BaseCustomException):
     status_code = status.HTTP_400_BAD_REQUEST
     detail = "Incorrect password"
