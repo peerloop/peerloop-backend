@@ -4,14 +4,17 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 
+from peerloop.core.dependencies.auth import get_current_user, get_current_verified_user
 from peerloop.core.exceptions.validation import InvalidEmailError
 from peerloop.core.utils.validation import is_valid_email_format
 from peerloop.domain.user.dtos import (
     LoginResponse,
     RegisterRequest,
     RegisterResponse,
+    UserResponse,
     VerifyEmailRequest,
 )
+from peerloop.domain.user.models import User
 from peerloop.domain.user.service import UserService
 
 router = APIRouter(tags=["user"])
@@ -49,3 +52,15 @@ async def verify_email(
     request: VerifyEmailRequest, user_service: UserService = Depends(Provide["user_container.user_service"])
 ) -> None:
     await user_service.verify_email(email=request.email, verification_code=request.verification_code)
+
+
+@router.get("/me", status_code=status.HTTP_200_OK, response_model=UserResponse)
+@inject
+async def get_me(user: Annotated[User, Depends(get_current_user)]) -> User:
+    return user
+
+
+@router.get("/verified-me", status_code=status.HTTP_200_OK, response_model=UserResponse)
+@inject
+async def get_verified_me(user: Annotated[User, Depends(get_current_verified_user)]) -> User:
+    return user

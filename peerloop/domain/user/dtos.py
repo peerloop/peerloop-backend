@@ -56,3 +56,9 @@ class VerifyEmailRequest(BaseModel):
         if not is_valid_email_format(v):
             raise InvalidEmailError(f"Invalid Email Error: {v} is not a valid email address.")
         return v
+
+
+class UserResponse(BaseModel):
+    id: int = Field(default=...)
+    email: str = Field(default=...)
+    is_verified: bool = Field(default=...)
