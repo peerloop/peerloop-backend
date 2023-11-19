@@ -46,20 +46,6 @@ class RegisterResponse(BaseModel):
     email: str = Field(default=..., examples=["changjin9792@gmail.com"])
 
 
-class LoginRequest(BaseModel):
-    email: str = Field(default=..., examples=["changjin9792@gmail.com"])
-    password: str = Field(default=..., examples=["Asdfk123*"])
-
-    @validator("email")
-    def email_must_be_valid(cls, v: str) -> str:
-        try:
-            validation = validate_email(v)
-            email = validation.email
-        except EmailNotValidError:
-            raise InvalidEmailError(f"Invalid Email Error: {v} is not a valid email address.")
-        return email
-
-
 class LoginResponse(BaseModel):
     access_token: str = Field(default=...)
     refresh_token: str = Field(default=...)
