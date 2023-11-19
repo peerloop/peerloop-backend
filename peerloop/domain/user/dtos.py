@@ -1,10 +1,8 @@
-from email_validator import EmailNotValidError, validate_email
 from pydantic import BaseModel, Field, validator
 
-from peerloop.domain.user.exceptions import (
-    InvalidEmailError,
-    InvalidPasswordFormatError,
-)
+from peerloop.core.exceptions.validation import InvalidEmailError
+from peerloop.core.utils.validation import is_valid_email_format
+from peerloop.domain.user.exceptions import InvalidPasswordFormatError
 
 
 class RegisterRequest(BaseModel):
@@ -13,12 +11,9 @@ class RegisterRequest(BaseModel):
 
     @validator("email")
     def email_must_be_valid(cls, v: str) -> str:
-        try:
-            validation = validate_email(v)
-            email = validation.email
-        except EmailNotValidError:
+        if not is_valid_email_format(v):
             raise InvalidEmailError(f"Invalid Email Error: {v} is not a valid email address.")
-        return email
+        return v
 
     @validator("password")
     def password_must_be_valid(cls, v: str) -> str:
@@ -46,20 +41,6 @@ class RegisterResponse(BaseModel):
     email: str = Field(default=..., examples=["changjin9792@gmail.com"])
 
 
-class LoginRequest(BaseModel):
-    email: str = Field(default=..., examples=["changjin9792@gmail.com"])
-    password: str = Field(default=..., examples=["Asdfk123*"])
-
-    @validator("email")
-    def email_must_be_valid(cls, v: str) -> str:
-        try:
-            validation = validate_email(v)
-            email = validation.email
-        except EmailNotValidError:
-            raise InvalidEmailError(f"Invalid Email Error: {v} is not a valid email address.")
-        return email
-
-
 class LoginResponse(BaseModel):
     access_token: str = Field(default=...)
     refresh_token: str = Field(default=...)
@@ -72,9 +53,6 @@ class VerifyEmailRequest(BaseModel):
 
     @validator("email")
     def email_must_be_valid(cls, v: str) -> str:
-        try:
-            validation = validate_email(v)
-            email = validation.email
-        except EmailNotValidError:
-            raise InvalidEmailError(detail=v)
-        return email
+        if not is_valid_email_format(v):
+            raise InvalidEmailError(f"Invalid Email Error: {v} is not a valid email address.")
+        return v
