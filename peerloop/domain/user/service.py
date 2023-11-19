@@ -17,6 +17,7 @@ from peerloop.domain.user.exceptions import (
     VerificationCodeDoesNotExistError,
     VerificationCodeExpiredError,
 )
+from peerloop.domain.user.models import User
 from peerloop.domain.user.repository import EmailVerificationRepository, UserRepository
 
 
@@ -100,3 +101,11 @@ class UserService:
 
         # Update is_verified to True
         await self.user_repo.update_by_id(id=user.id, params={"is_verified": True})
+
+    async def get_user_by_id(self, user_id: int) -> User:
+        # Check whether the user exists
+        user = await self.user_repo.get_by_id(id=user_id)
+        if user is None:
+            raise UserDoesNotExistError(f"User Does Not Exist Error: {user_id} does not exist.")
+
+        return user
