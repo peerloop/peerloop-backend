@@ -7,7 +7,7 @@ from peerloop.domain.auth.service import AuthService
 router = APIRouter(tags=["auth"])
 
 
-@router.post("/refresh_token", status_code=status.HTTP_200_OK, response_model=RefreshTokenResponse)
+@router.post("/refresh-token", status_code=status.HTTP_200_OK, response_model=RefreshTokenResponse)
 @inject
 async def refresh_token(
     request: RefreshTokenRequest, auth_service: AuthService = Depends(Provide["auth_container.auth_service"])
