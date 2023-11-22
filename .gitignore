@@ -1,3 +1,6 @@
+volumes
+.ruff_cache
+
 # Custom
 .env.*
 **/debug_*
