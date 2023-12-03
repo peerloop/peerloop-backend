@@ -20,7 +20,7 @@ from peerloop.domain.user.service import UserService
 router = APIRouter(tags=["user"])
 
 
-@router.post("/register", status_code=status.HTTP_201_CREATED, response_model=RegisterResponse)
+@router.post("/users", status_code=status.HTTP_201_CREATED, response_model=RegisterResponse)
 @inject
 async def register(
     request: RegisterRequest, user_service: UserService = Depends(Provide["user_container.user_service"])
@@ -29,7 +29,7 @@ async def register(
     return RegisterResponse(email=request.email)
 
 
-@router.post("/login", status_code=status.HTTP_200_OK, response_model=LoginResponse)
+@router.post("/users/login", status_code=status.HTTP_200_OK, response_model=LoginResponse)
 @inject
 async def login(
     request: Annotated[OAuth2PasswordRequestForm, Depends()],
@@ -44,7 +44,7 @@ async def login(
 
 
 @router.post(
-    "/verifications",
+    "/users/verification",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 @inject

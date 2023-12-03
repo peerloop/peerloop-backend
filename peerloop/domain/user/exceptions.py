@@ -3,6 +3,22 @@ from fastapi import status
 from peerloop.core.exceptions.base import BaseCustomException
 
 
+# Persistence exceptions
+class UserNotExistError(BaseCustomException):
+    status_code = status.HTTP_400_BAD_REQUEST
+
+    def __init__(self, detail: str) -> None:
+        super().__init__(self.status_code, detail)
+
+
+class EmailVerificationNotExistError(BaseCustomException):
+    status_code = status.HTTP_400_BAD_REQUEST
+
+    def __init__(self, detail: str) -> None:
+        super().__init__(self.status_code, detail)
+
+
+# Domain exceptions
 class InvalidPasswordFormatError(BaseCustomException):
     status_code = status.HTTP_400_BAD_REQUEST
 
@@ -10,25 +26,18 @@ class InvalidPasswordFormatError(BaseCustomException):
         super().__init__(self.status_code, detail)
 
 
-class DuplicateEmailError(BaseCustomException):
+class UserAlreadyRegisteredError(BaseCustomException):
     status_code = status.HTTP_400_BAD_REQUEST
 
     def __init__(self, detail: str) -> None:
         super().__init__(self.status_code, detail)
 
 
-class UserDoesNotExistError(BaseCustomException):
+class UserNotRegisteredError(BaseCustomException):
     status_code = status.HTTP_400_BAD_REQUEST
 
-    def __init__(self, detail: str) -> None:
-        super().__init__(self.status_code, detail)
-
-
-class UserAlreadyExistsError(BaseCustomException):
-    status_code = status.HTTP_400_BAD_REQUEST
-
-    def __init__(self, detail: str) -> None:
-        super().__init__(self.status_code, detail)
+    def __init__(self, email: str) -> None:
+        super().__init__(self.status_code, detail=f"User not registered: {email}")
 
 
 class UserNotVerifiedError(BaseCustomException):

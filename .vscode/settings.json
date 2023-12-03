@@ -1,7 +1,9 @@
 {
     "cSpell.words": [
+        "dtos",
         "fastapi",
         "mailgun",
+        "ondelete",
         "peerloop",
         "redoc",
         "scopefunc",
