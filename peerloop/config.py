@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 
 @dataclass
-class MySQLConfig:
+class DBConfig:
     host: str
     port: int
     username: str
@@ -32,7 +32,7 @@ class RootConfig:
     env: str
     version: str
     logger_level: str
-    db: MySQLConfig
+    db: DBConfig
     jwt: JWTConfig
     mailgun: MailgunConfig
     db_url: str
@@ -41,12 +41,12 @@ class RootConfig:
 def load_config() -> RootConfig:
     load_dotenv(os.environ["ENV_FILE_PATH"])  # injected in __main__.py
 
-    db_config = MySQLConfig(
-        host=os.environ["MYSQL_HOST"],
-        port=int(os.environ["MYSQL_PORT"]),
-        username=os.environ["MYSQL_USER"],
-        password=os.environ["MYSQL_PASSWORD"],
-        db_name=os.environ["MYSQL_DB_NAME"],
+    db_config = DBConfig(
+        host=os.environ["DB_HOST"],
+        port=int(os.environ["DB_PORT"]),
+        username=os.environ["DB_USER"],
+        password=os.environ["DB_PASSWORD"],
+        db_name=os.environ["DB_NAME"],
     )
 
     jwt_config = JWTConfig(
@@ -65,6 +65,6 @@ def load_config() -> RootConfig:
         db=db_config,
         jwt=jwt_config,
         mailgun=mailgun_config,
-        db_url=f"mysql+aiomysql://{db_config.username}:{db_config.password}@{db_config.host}:3306/{db_config.db_name}",
+        db_url=f"postgresql+asyncpg://{db_config.username}:{db_config.password}@{db_config.host}:{db_config.port}/{db_config.db_name}",
     )
     return root_config
