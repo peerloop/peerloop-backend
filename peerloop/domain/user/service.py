@@ -9,12 +9,11 @@ from peerloop.core.utils.auth import (
     hash_password,
 )
 from peerloop.domain.user.exceptions import (
-    DuplicateEmailError,
     IncorrectPasswordError,
     InvalidVerificationCodeError,
-    UserAlreadyExistsError,
-    UserDoesNotExistError,
-    VerificationCodeDoesNotExistError,
+    UserAlreadyRegisteredError,
+    UserNotRegisteredError,
+    UserNotVerifiedError,
     VerificationCodeExpiredError,
 )
 from peerloop.domain.user.models import User
@@ -36,10 +35,10 @@ class UserService:
 
     async def create_user(self, email: str, password: str) -> None:
         # Check duplicated email
-        existing_user = await self.user_repo.get_user_by_email(email=email)
+        existing_user = await self.user_repo.get_user_or_none_by_email(email=email)
         if existing_user:
             if existing_user.is_verified:
-                raise DuplicateEmailError(f"Duplicate Email Error: {email} already exists.")
+                raise UserAlreadyRegisteredError(f"User already registered: {email}.")
             else:  # If unverified user exists, delete it and create new user.
                 await self.user_repo.delete_by_id(id=existing_user.id)
 
@@ -67,31 +66,33 @@ class UserService:
         password: str,
     ) -> dict[str, str]:
         # Check whether the user exists
-        existing_user = await self.user_repo.get_user_by_email(email=email)
-        if not existing_user:
-            raise UserDoesNotExistError(f"User Does Not Exist Error: {email} does not exist.")
+        user = await self.user_repo.get_user_or_none_by_email(email=email)
+        if not user:
+            raise UserNotRegisteredError(email=email)
+
+        # Check whether the user is verified
+        if not user.is_verified:
+            raise UserNotVerifiedError(f"User Not Verified: {email} is not verified.")
 
         # Check whether the password is correct
-        if not check_password(raw_password=password, hashed_password=existing_user.password):
+        if not check_password(raw_password=password, hashed_password=user.password):
             raise IncorrectPasswordError()
 
-        access_token, refresh_token = self.token_manager.create_tokens(sub=existing_user.id)
+        access_token, refresh_token = self.token_manager.create_tokens(sub=user.id)
         return {"access_token": access_token, "refresh_token": refresh_token}
 
     async def verify_email(self, email: str, verification_code: str) -> None:
         # Check if user exists
-        user = await self.user_repo.get_user_by_email(email=email)
+        user = await self.user_repo.get_user_or_none_by_email(email=email)
         if user is None:
-            raise UserDoesNotExistError(f"User Does Not Exist Error: {email} does not exist.")
+            raise UserNotRegisteredError(f"User not registered: {email} does not exist.")
 
         # Check if user is already verified
         if user.is_verified:
-            raise UserAlreadyExistsError(f"User Already Exists Error: {email} is already verified.")
+            raise UserAlreadyRegisteredError(f"User already registered: {email} is already registered.")
 
         # Check if verification code is expired
         email_verification = await self.email_verification_repo.get_email_verification_by_user_id(user_id=user.id)
-        if email_verification is None:
-            raise VerificationCodeDoesNotExistError()
         if email_verification.expiration_time < datetime.utcnow():
             raise VerificationCodeExpiredError()
 
@@ -106,6 +107,6 @@ class UserService:
         # Check whether the user exists
         user = await self.user_repo.get_by_id(id=user_id)
         if user is None:
-            raise UserDoesNotExistError(f"User Does Not Exist Error: {user_id} does not exist.")
+            raise UserNotRegisteredError(f"User is not registered: {user_id} does not exist.")
 
         return user
