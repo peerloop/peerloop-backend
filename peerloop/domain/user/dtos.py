@@ -1,61 +1,47 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 
-from peerloop.core.exceptions.validation import InvalidEmailError
-from peerloop.core.utils.validation import is_valid_email_format
-from peerloop.domain.user.exceptions import InvalidPasswordFormatError
+from peerloop.core.base_class.pydantic_model import EmailMixin, PasswordMixin
+from peerloop.domain.user.constants import ExternalLinkName
 
 
-class RegisterRequest(BaseModel):
+# Create User DTOs
+class ExternalLink(BaseModel):
+    name: ExternalLinkName = Field(default=..., examples=["github"])
+    url: str = Field(default=..., examples=["github.com/noisrucer"])
+
+
+class RegisterRequest(BaseModel, EmailMixin, PasswordMixin):
     email: str = Field(default=..., examples=["changjin9792@gmail.com"])
     password: str = Field(default=..., examples=["Asdfk123*"], min_length=6, max_length=50)
-
-    @validator("email")
-    def email_must_be_valid(cls, v: str) -> str:
-        if not is_valid_email_format(v):
-            raise InvalidEmailError(f"Invalid Email Error: {v} is not a valid email address.")
-        return v
-
-    @validator("password")
-    def password_must_be_valid(cls, v: str) -> str:
-        """
-        Rules
-        1) Must be 6 <= len(pwd) <= 50
-        2) Must contain at least one capital letter
-        3) Must contain at least one lower-case letter
-        4) Must contain at least one special character. One of (@, #, $, %, *, !)
-        """
-        if len(v) < 6 or len(v) > 50:
-            raise InvalidPasswordFormatError("Password must be 6 <= len(pwd) <= 50")
-        if not any(char.isupper() for char in v):
-            raise InvalidPasswordFormatError("Password must contain at least one capital letter")
-        if not any(char.islower() for char in v):
-            raise InvalidPasswordFormatError("Password must contain at least one lower-case letter")
-        if not any(char in ["@", "#", "$", "%", "*", "!"] for char in v):
-            raise InvalidPasswordFormatError(
-                "Password must contain at least one special character. One of (@, #, $, %, *, !)"
-            )
-        return v
+    username: str = Field(default=..., examples=["noisrucer"], min_length=1, max_length=50)
+    job_title: str = Field(default=None, examples=["Backend Engineer"], min_length=1, max_length=50)
+    organization: str = Field(default=None, examples=["peerloop"], min_length=1, max_length=50)
+    bio: str = Field(default=None, examples=["I am a backend engineer at peerloop"], min_length=5, max_length=500)
+    country: str = Field(default=None, examples=["South Korea"], min_length=1, max_length=50)
+    img_url: str = Field(default=None, examples=["https://peerloop.io/img/profile.png"], min_length=1, max_length=500)
+    external_links: list[ExternalLink] = Field(
+        default=None,
+        examples=[
+            [{"name": "github", "url": "github.com/noisrucer"}, {"name": "linkedin", "url": "linkedin.com/noisrucer"}]
+        ],
+    )
 
 
 class RegisterResponse(BaseModel):
     email: str = Field(default=..., examples=["changjin9792@gmail.com"])
 
 
+# Login DTOs
 class LoginResponse(BaseModel):
     access_token: str = Field(default=...)
     refresh_token: str = Field(default=...)
     token_type: str = Field(default="bearer")
 
 
-class VerifyEmailRequest(BaseModel):
-    email: str = Field(default=...)
+# Verify Email DTOs
+class VerifyEmailRequest(BaseModel, EmailMixin):
+    email: str = Field(default=..., examples=["changjin9792@gmail.com"])
     verification_code: str = Field(default=...)
-
-    @validator("email")
-    def email_must_be_valid(cls, v: str) -> str:
-        if not is_valid_email_format(v):
-            raise InvalidEmailError(f"Invalid Email Error: {v} is not a valid email address.")
-        return v
 
 
 class UserResponse(BaseModel):

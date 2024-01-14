@@ -3,6 +3,7 @@
         "dtos",
         "fastapi",
         "mailgun",
+        "noisrucer",
         "ondelete",
         "peerloop",
         "redoc",
